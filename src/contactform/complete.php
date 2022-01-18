@@ -2,13 +2,12 @@
 session_start();
 
 if (isset($_POST['submit'])) {
-$_SESSION['title'] = $_POST['title'];
-$_SESSION['mail'] = $_POST['mail'];
-$_SESSION['content'] = $_POST['content'];
+    $_SESSION['title'] = $_POST['title'];
+    $_SESSION['mail'] = $_POST['mail'];
+    $_SESSION['content'] = $_POST['content'];
 
-header('Location:history.php');
+    header('Location:history.php');
 }
-
 ?>
 
 <!DOCTYPE html>
