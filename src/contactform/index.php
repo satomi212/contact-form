@@ -10,18 +10,19 @@
 <body>
     <h2>お問い合わせフォーム</h2>
     <p>以下のフォームからお問い合わせください。</p>
-    <form action="" method="post"></form>
+    <form action="complete.php" method="post">
 
     <label for="title">タイトル（必須）</label>
     <input id="title" type="text" name="title" placeholder="タイトル">
     <br>
-    <label for="mail">Email（必須）</label>
-    <input id="mail" type="text" name="mail" placeholder="Emailアドレス">
+    <label for="email">Email（必須）</label>
+    <input id="email" type="text" name="email" placeholder="Emailアドレス">
     <br>
     <label for="content">お問い合わせ内容（必須）</label>
     <textarea id="content" name="content" cols="30" rows="3" placeholder="お問い合わせ内容（1000文字まで）をお書きください"></textarea>
     <br>
-    <button onclick="location.href='./complete.php'" name ="submit">送信</button>
+    <button type="submit" name="submit">送信</button>
 
+    </form>
 </body>
 </html>
