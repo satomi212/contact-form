@@ -1,25 +1,26 @@
-<?php
-session_start();
 
-$db['user_name'] = 'root';
-$db['password'] = 'password';
-$pdo = new PDO(
-    'mysql:host=mysql; dbname=contact_form; charset=utf8',
-    $db['user_name'],
-    $db['password']
-);
+<?php try {
+    // DB接続
+    $dsn = 'mysql:dbname=contact_form;host=mysql;charset=utf8';
+    $user = 'root';
+    $password = 'password';
+    $dbh = new PDO($dsn, $user, $password);
 
-$title = $_SESSION['title']; //ユーザーから受け取った値を変数に入れる
-$mail = $SESSION['main'];
-$content = $SESSION['content'];
+    // SQL
+    $sql = 'SELECT * FROM contacts';
 
-$stmt = $pdo->prepare('INSERT INTO name(uname) VALUES(:name)'); //登録準備
-$stmt->bindValue(':name', $name, PDO::PARAM_STR); //登録する文字の型を固定
-$stmt->execute(); //データベースの登録を実行
-$pdo = null;
+    // prepareでSQLを確定
+    $stmt = $dbh->prepare($sql);
 
-//データベース接続を解除
-?>
+    // executeでSQLを実行
+    $stmt->execute();
+
+    // 結果の取得
+    $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo 'データベースに接続できませんでした。' . $e->getMessage();
+    exit();
+} ?>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -29,8 +30,18 @@ $pdo = null;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>送信履歴</title>
 </head>
+
 <body>
-    <h2>送信履歴</h2>
-    <a href="index.php">戻る</a>
+    <div class="container">
+        <h2>送信履歴</h2>
+
+        <?php foreach ($contacts as $contact): ?>
+            <h3><?php echo $contact['title']; ?></h3>
+            <p><?php echo $contact['content']; ?></p>
+        <?php endforeach; ?>
+
+        <a href="index.php">戻る</a>
+    </div>
 </body>
+
 </html>

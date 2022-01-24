@@ -1,12 +1,65 @@
 <?php
-session_start();
 
-if (isset($_POST['submit'])) {
-    $_SESSION['title'] = $_POST['title'];
-    $_SESSION['mail'] = $_POST['mail'];
-    $_SESSION['content'] = $_POST['content'];
+// 値を取得
+$title = filter_input(INPUT_POST, 'title');
+$email = filter_input(INPUT_POST, 'email');
+$content = filter_input(INPUT_POST, 'content');
 
-    header('Location:history.php');
+// DB接続
+$dsn = 'mysql:dbname=contact_form;host=mysql;charset=utf8';
+$user = 'root';
+$password = 'password';
+$dbh = new PDO($dsn, $user, $password);
+
+// SQL
+$sql =
+    'INSERT INTO contacts (title, email, content) VALUES (:title, :email, :content)';
+
+// prepareでSQLを確定
+$stmt = $dbh->prepare($sql);
+
+// 値を受け取る（bindValueでSQLインジェクション防ぐ）
+$stmt->bindValue(':title', $title, PDO::PARAM_STR);
+$stmt->bindValue(':email', $email, PDO::PARAM_STR);
+$stmt->bindValue(':content', $content, PDO::PARAM_STR);
+
+// executeでSQLを実行
+$stmt->execute();
+
+// 送信方法バリデーション
+$errors = [];
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    $errors[] = 'post送信になっていません';
+}
+
+// 入力内容バリデーション
+if (empty($title)) {
+    $errors[] = '「タイトル」を入力してください。';
+}
+
+if (empty($email)) {
+    $errors[] = '「Email」を入力してください。';
+}
+
+if (empty($content)) {
+    $errors[] = '「内容」を入力してください。';
+}
+
+// 中身
+if (empty($errors)) {
+    $message = '送信完了!!!';
+    $links = '
+    <a href="./index.php">
+    <p>送信画面へ</p>
+    </a>
+    <a href="./history.php">
+    <p>送信履歴を見る</p>
+    </a>';
+} else {
+    $links = '
+    <a href="./index.php">
+    <p>送信画面へ</p>
+    </a>';
 }
 ?>
 
@@ -20,9 +73,21 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body>
-    <h2>送信完了！！！</h2>
-    <a href="index.php">送信画面へ</a>
-    <br><br>
-    <a href="history.php">送信履歴を見る</a>
+    <div class="container">
+        <?php if (!empty($errors)): ?>
+            <?php foreach ($errors as $error): ?>
+                <p><?php echo $error . "\n"; ?></p>
+            <?php endforeach; ?>
+            <?php echo $links; ?>
+        <?php endif; ?>
+
+        <?php if (empty($errors)): ?>
+            <?php
+            echo '<h2>' . $message . '</h2>';
+            echo $links;
+            ?>
+        <?php endif; ?>
+    </div>
+
 </body>
 </html>
